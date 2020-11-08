@@ -1,5 +1,6 @@
 import sys
 import chardet
+import re
 
 def parse_dpy_file(dpy_file_path: str):
     test_depend = dict()
@@ -16,6 +17,7 @@ def parse_dpy_file(dpy_file_path: str):
             else:
                 elements = line.strip('\n').split('@@@')
                 # key - class, val - (checksum, format)
+                elements[0] = elements[0].replace(re.search(r'\$\$[0-9a-z]{8}', elements[0]).group(), '')
                 test_depend[key][elements[0]] = (elements[1], elements[2])
     return test_depend
 
@@ -33,9 +35,11 @@ if __name__ == '__main__':
 
     print(f'Testfiles in {dpy_file_1} not in {dpy_file_2}:', end=' ')
     print([item for item in depend_set_1])
+    print()
     
     print(f'Testfiles in {dpy_file_2} not in {dpy_file_1}:', end=' ')
     print([item for item in depend_set_2])
+    print()
 
     print('Testfiles difference:')
     for test in dpy_dict_1.keys() & dpy_dict_2.keys():
@@ -67,3 +71,4 @@ if __name__ == '__main__':
             if(len(class_list) != 0):
                 for citem in class_list:
                     print(f'{citem}: {",".join(class_dict_1[citem])} {",".join(class_dict_2[citem])}')
+            print()
